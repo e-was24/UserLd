@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Leaderboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ff9800;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background-color: #333;
+            color: #ff9800;
+        }
+        tr:hover {
+            background-color: #2a2a2a;
+        }
+        .rank {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Leaderboard</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th class="rank">Rank</th>
+                    <th>User</th>
+                    <th>Total Purchases</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                <!-- Data will be injected here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function populateLeaderboard() {
+            const leaderboardBody = document.getElementById('leaderboard-body');
+            leaderboardBody.innerHTML = '';
+
+            const users = JSON.parse(localStorage.getItem('leaderboard')) || [];
+
+            users.sort((a, b) => b.purchases - a.purchases);
+
+            users.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td>${user.name}</td>
+                    <td>Rp. ${user.purchases.toLocaleString()}</td>
+                `;
+                leaderboardBody.appendChild(row);
+            });
+        }
+
+        // Periksa pembaruan leaderboard setiap 1 detik
+        let lastUpdated = localStorage.getItem('leaderboardUpdated') || 0;
+        setInterval(() => {
+            const currentUpdated = localStorage.getItem('leaderboardUpdated');
+            if (currentUpdated && currentUpdated !== lastUpdated) {
+                lastUpdated = currentUpdated;
+                populateLeaderboard();
+            }
+        }, 1000);
+
+        populateLeaderboard();
+    </script>
+</body>
+</html>
